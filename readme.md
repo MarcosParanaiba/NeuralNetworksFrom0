@@ -1,0 +1,25 @@
+# Neural Networks From 0
+## ... why?
+This is a repository for me (Marchitos) to study more deeply the understaing the neural networks' structure by not using any library.
+You probably are thinking 'why do all that effort? Just use a library!', but, when you try to reconstruct something and understand it's core, you become more proficient in that.
+Just like when you understand a physics equation and can use that logic to expand your habilities.
+So, by doing that Sisyphean task, I hpe that my, and your's, compreension and manipulation of fourther uses of the many kinds of neural cells will be vastly amplified.
+
+<sup><sub>(Btw I'm making that as basically a hobby, updating the code when I manage my other studies...😅)</sub></sup>
+
+## What I have so far
+The empty checkboxes are objectives that I already planned (I probably will add more objectives)
+### Functions:
+  - [x] σ (Sigmoid)
+  - [x] tanh (Tanh)
+  - [ ] reLU
+### Cell & Layer types
+ - [x] Dense
+ - [ ] Recurrent
+ - [ ] LSTM
+ - [ ] GRU
+ - [ ] Convolutional
+### Network types
+ - [x] Basic
+ - [ ] Auto Encoder
+ - [ ] Varitional Auto Encoder
