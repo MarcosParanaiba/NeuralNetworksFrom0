@@ -34,3 +34,12 @@ class Tanh(Function):
     @classmethod
     def d(cls, x):
         return 1 - (np.tanh(x)**2)
+
+class reLU(Function):
+    @classmethod
+    def f(cls, x):
+        return max(0, x)
+
+    @classmethod
+    def d(cls, x):
+        return max(0, x) / x

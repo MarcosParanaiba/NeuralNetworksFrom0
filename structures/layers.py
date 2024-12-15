@@ -83,3 +83,9 @@ class DenseLayer(NeuralLayer):
         """Set bias."""
         for (i, v) in enumerate(value):
             self.cells[i].bias = v
+
+class RecurrentLayer(DenseLayer):
+    def __init__(self, input_size, size, function = f.Tanh):
+        super().__init__(input_size, size, function)
+        self.cells = [c.RecurrentCell(input_size, function)
+                      for _ in range(size)]

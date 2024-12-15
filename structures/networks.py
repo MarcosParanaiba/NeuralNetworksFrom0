@@ -33,9 +33,14 @@ class NeuralNetwork:
         np.ndarray
             The output value of the transformations.
         """
+        inputs = [inputs] if inputs.ndim == 1 else inputs
+
         for layer in self.layers:
-            inputs = layer.feedforward(inputs)
+            inputs = np.array([layer.feedforward(inp)
+                               for inp in inputs])
+
         return inputs
+
     def backwardpass(self, error: np.ndarray, learning_rate: float):
         """Compute the backwardpass of the layer.
 
@@ -81,16 +86,21 @@ class NeuralNetwork:
                 The error aross the epochs.
         """
         gradient = np.empty(epochs)
-        if method == 'stochastic':
-            for epoch in range(epochs):
-                errors = 0
-                learning_rate = learning_schedules.setlearning(epoch)
-                u = [self.feedforward(inp) for inp in inputs]
-                for (i, answer) in enumerate(answers):
-                    error = answer - u[i]
-                    errors += error
-                    self.backwardpass(error, learning_rate)
-                gradient[epoch] = (errors/answers.shape[0]) ** 2
+
+        for epoch in range(epochs):
+            learning_rate = learning_schedules.setlearning(epoch)
+            u = self.feedforward(inputs)
+
+            error = answers - u
+            gradient[epoch] = np.absolute(np.sum(error)/answers.shape[0])
+            error = [error] if error.ndim == 1 else error
+
+            if method == 'stochastic':
+                for err in error:
+                    self.backwardpass(err, learning_rate)
+            elif method == 'batch':
+                error = np.mean(error, axis=0)
+                self.backwardpass(error, learning_rate)
 
         return gradient
 

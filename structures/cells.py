@@ -93,3 +93,32 @@ class DenseCell(NeuralCell):
         if self._bias.shape != value.shape:
             raise AttributeError("Wrong Shape")
         self._bias = value
+
+class RecurrentCell(DenseCell):
+    def __init__(self, input_size, function = f.Tanh):
+        super().__init__(input_size, function)
+        self._hweights = np.random.uniform(-np.sqrt(6 / input_size),
+                                          np.sqrt(6 / input_size), 1)
+        self.h = self.output
+
+    def feedforward(self, inputs):
+        self.inputs = inputs
+        self.h = self.output
+
+        hz = self.h * self._hweights
+        self.z = np.dot(self.inputs, self._weights) + self._bias + hz
+        self.output = self.function.f(self.z)
+
+        return self.output.item()
+
+    def backwardpass(self, error, learning_rate):
+        dbias = error * self.function.d(self.z)
+        dweights = np.dot(self.inputs.reshape(-1, 1), dbias)
+        dhweights = self.h * dbias
+        dinput = np.dot(dbias, self._weights.T)
+
+        self._weights += dweights * learning_rate
+        self._hweights += sum(dhweights * learning_rate)
+        self.bias += np.sum(dbias * learning_rate)
+
+        return dinput

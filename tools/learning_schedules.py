@@ -19,3 +19,24 @@ class NoSchedule(LearningSchedule):
 
     def setlearning(self, _):
         return self.initial_rate
+
+class TimeBasedSchedule(LearningSchedule):
+    """An Time Based Schedule"""
+    def __init__(self, initial_rate, decay):
+        self.initial_rate = initial_rate
+        self.decay = decay
+
+    def setlearning(self, epoch):
+        return self.initial_rate * ((1 + (self.decay * epoch))
+                                    ** (-epoch - 1) )
+
+class StepBasedSchedule(LearningSchedule):
+    """An Step Based Schedule"""
+    def __init__(self, initial_rate, decay, step):
+        self.initial_rate = initial_rate
+        self.decay = decay
+        self.step = step
+
+    def setlearning(self, epoch):
+        return self.initial_rate * (self.decay **
+                                    np.floor((1 + epoch) / self.step))
