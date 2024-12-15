@@ -2,6 +2,7 @@
 # Neural Networks From 0
 
 This is a repository for me to study more deeply the understaing the neural networks' structure by not using any library. Hopefully, I will also help you!
+Any feedback will be very welcome and helpfull
 
 ## ... why?
 
