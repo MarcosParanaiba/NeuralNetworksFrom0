@@ -137,7 +137,7 @@ class RecurrentCell(DenseCell):
 
         output (np.ndarray): The output of the neuron after applying the
         activation function.
-        """
+    """
     def __init__(self, input_size, function=f.TanH):
         super().__init__(input_size + 1, function)
     def feedforward(self, inputs):
@@ -147,3 +147,106 @@ class RecurrentCell(DenseCell):
 
     def backwardpass(self, error, learning_rate):
         return super().backwardpass(error, learning_rate)[:-1]
+
+class ConvolutionalCell(NeuralCell):
+    """An Recurrent Cell
+    
+
+    Attributes:
+    -----------
+        kernele (np.ndarray): The kernel matrix.
+
+        bias (np.ndarray): The bias term.
+
+        inputs (np.ndarray): The input values for the neuron during
+        feedforward.
+
+        z (np.ndarray): The sum of the channels' convolutions.
+
+        function (Type[f.Function]): The activation function applied to
+        the linear combination.
+
+        output (np.ndarray): The output of the neuron after applying the
+        activation function.
+    """
+    def __init__(self, input_size: int, kernel_size: int,
+                 input_channels: int, function: Type[f.Function]):
+        self._kernel = np.random.uniform(-np.sqrt(6 / input_size),
+                                          np.sqrt(6 / input_size),
+                                          (kernel_size, kernel_size))
+        self._bias = np.zeros(1)
+        self.inputs = np.empty((input_size, input_size))
+        self.z = np.empty((input_size - kernel_size + 1,
+                           input_size - kernel_size + 1),
+                           input_channels)
+        self.function = function
+        self.output = np.empty((input_size - kernel_size + 1,
+                                input_size - kernel_size + 1))
+    def convolution(self, x: np.ndarray, k: np.ndarray,
+                    padding: int = 0):
+        """The convolution function
+
+        Parameters:
+        -----------
+            x (np.ndarray): The matrix to be convolutioned.
+            k (np.ndarray): The kernel that will convolutionize.
+            padding (int): How much will the x will be padded.
+                If 'full' the convolution will be full
+
+        """
+        x_size = x.shape[0]
+        k_size = k.shape[0]
+        reduction = k_size - 1
+
+        if padding == 'full':
+            x = np.pad(x, reduction, 'constant',
+                    constant_values = 0)
+
+        if padding > 0:
+            x = np.pad(x, min(reduction, padding), 'constant',
+                    constant_values = 0)
+
+        return np.array([[np.sum(x[r : r + k_size, c : c + k_size] * k
+                 for c in range(x_size - reduction))]
+                for r in range(x_size-reduction)])
+
+    def feedforward(self, inputs):
+        self.inputs = inputs
+
+        self.z = np.sum(self.convolution(inputs, self.kernel), axis = 2)
+
+        self.output = self.function(self.z)
+
+        return self.output
+
+    def backwardpass(self, error, learning_rate):
+        dbias  = error * self.function.d(self.z)
+        dkernel = self.convolution(self.inputs, dbias)
+        dinput = self.convolution(np.rot90(self._kernel, 2), dbias)
+
+        self.bias += dbias * learning_rate
+        self.kernel += dkernel * learning_rate
+
+        return dinput
+
+    @property
+    def kernel(self):
+        """Get weights."""
+        return self._kernel
+    @kernel.setter
+    def weights(self, value):
+        """Set weights."""
+        if self._kernel.shape != value.shape:
+            raise AttributeError("Wrong Shape")
+        self._weights = value
+
+    @property
+    def bias(self):
+        """Get bias."""
+        return self._bias
+    @bias.setter
+    def bias(self, value):
+        """Set bias."""
+        if self._bias.shape != value.shape:
+            raise AttributeError("Wrong Shape")
+        self._bias = value

@@ -137,3 +137,30 @@ class RecurrentLayer(DenseLayer):
         super().__init__(input_size, size, function)
         self.cells = [c.RecurrentCell(input_size, function)
                       for _ in range(size)]
+
+class ConvolutionalLayer(NeuralLayer):
+    def __init__(self, input_size: int, size: int, kernel_size: int,
+                 input_channels: int, function: Type[f.Function]):
+        super().__init__([c.ConvolutionalCell(input_size, kernel_size,
+                                              input_channels, function)
+                      for _ in range(size)])
+
+    @property
+    def weights(self):
+        """Get weights."""
+        return np.array([cell.kernel for cell in self.cells])
+    @weights.setter
+    def weights(self, value):
+        """Set weights."""
+        for (i, v) in enumerate(value):
+            self.cells[i].kernel = v
+
+    @property
+    def biases(self):
+        """Get biases."""
+        return np.array([cell.bias for cell in self.cells])
+    @biases.setter
+    def biases(self, value):
+        """Set bias."""
+        for (i, v) in enumerate(value):
+            self.cells[i].bias = v
