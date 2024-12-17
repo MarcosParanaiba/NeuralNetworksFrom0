@@ -7,7 +7,7 @@ class Function(ABC):
     @classmethod
     @abstractmethod
     def f(cls, x):
-        pass
+        """The call of the function"""
 
     @classmethod
     @abstractmethod
@@ -25,8 +25,8 @@ class Sigmoid(Function):
     def d(cls, x):
         return cls.f(x) * (1 - cls.f(x))
 
-class Tanh(Function):
-    """A Tanh function"""
+class TanH(Function):
+    """A TanH function"""
     @classmethod
     def f(cls, x):
         return np.tanh(x)
@@ -36,6 +36,7 @@ class Tanh(Function):
         return 1 - (np.tanh(x)**2)
 
 class reLU(Function):
+    """A reLU"""
     @classmethod
     def f(cls, x):
         return max(0, x)

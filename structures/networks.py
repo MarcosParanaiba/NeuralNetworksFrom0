@@ -8,6 +8,7 @@ class NeuralNetwork:
     """An basic Neural Network"""
     def __init__(self, *args: Type[l.DenseLayer]):
         self.layers = list(args)
+
     def addlayer(self, *args: Type[l.DenseLayer]):
         """Adds layers to the network.
         
@@ -17,6 +18,7 @@ class NeuralNetwork:
             The layers to be added.
         """
         self.layers.extend(args)
+
     def feedforward(self, inputs: np.ndarray):
         """Compute de feedfoward of the layer.
         
@@ -113,6 +115,7 @@ class NeuralNetwork:
         """Set weights."""
         for (i, v) in enumerate(value):
             self.layers[i].weights = v
+
     @property
     def weights_shape(self):
         """Get the weights' shape"""
