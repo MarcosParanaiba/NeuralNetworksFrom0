@@ -181,3 +181,109 @@ class ConvolutionalLayer(NeuralLayer):
         """Set bias."""
         for (i, v) in enumerate(value):
             self.cells[i].bias = v
+
+class MaxPoolingLayer:
+    """An Layer that Pools the input by a Max factor
+    
+    Attributes:
+    -----------
+        pooling_size (int): The range of the pooling in the input.
+
+        inputs (np.ndarray): The input values for the layer during
+        feedforward.
+    
+        output (np.ndarray): The output of the layer after applying
+        each neurons' transformations.
+
+        mask (np.ndarray): The coords of the selected outputs
+    """
+    def __init__(self, pooling_size: int):
+        self.pooling_size = pooling_size
+        self.inputs = None
+        self.output = None
+        self.mask = None
+        self.weights = None
+        self.biases = None
+
+    def feedforward(self, inputs):
+        self.inputs = inputs
+        input_size = inputs.shape[0]
+        reduction = input_size - self.pooling_size + 1
+
+        self.output = []
+        self.mask = []
+
+        for raxis in range(reduction):
+            self.output.append([])
+            self.mask.append([])
+            for caxis in range(reduction):
+                window = inputs[raxis : raxis + self.pooling_size,
+                                caxis : caxis + self.pooling_size]
+
+                max_val = np.max(window)
+                self.output[raxis].append(max_val)
+
+                pos = np.unravel_index(np.argmax(window), window.shape)
+                self.mask[raxis].append(pos)
+
+        self.output = np.array(self.output)
+        self.mask = np.array(self.mask)
+        return self.output
+
+    def backwardpass(self, error, _):
+        dinput = np.zeros(self.inputs.shape)
+
+        for (raxis, rerror) in error:
+            for (caxis, error_val) in rerror:
+                mask = self.mask[raxis, caxis]
+                dinput[mask[0], mask[1]] += error_val
+
+        return dinput
+
+class AvrgPoolingLayer:
+    """An Layer that Pools the input by an Average factor
+    
+    Attributes:
+    -----------
+        pooling_size (int): The range of the pooling in the input.
+
+        inputs (np.ndarray): The input values for the layer during
+        feedforward.
+    
+        output (np.ndarray): The output of the layer after applying
+        each neurons' transformations.
+    """
+    def __init__(self, pooling_size):
+        self.pooling_size = pooling_size
+        self.inputs = None
+        self.output = None
+
+    def feedforward(self, inputs):
+        self.inputs = inputs
+        input_size = inputs.shape[0]
+        reduction = input_size - self.pooling_size + 1
+
+        self.output = []
+
+        for raxis in range(reduction):
+            self.output.append([])
+            for caxis in range(reduction):
+                window = inputs[raxis : raxis + self.pooling_size,
+                                caxis : caxis + self.pooling_size]
+
+                avrg_val = np.average(window)
+                self.output[raxis].append(avrg_val)
+
+        self.output = np.array(self.output)
+        return self.output
+
+    def backwardpass(self, error, _):
+        dinput = np.zeros(self.inputs.shape)
+
+        for (raxis, rerror) in error:
+            for (caxis, error_val) in rerror:
+                val = error_val / error.size
+                dinput[raxis : raxis + self.pooling_size,
+                       caxis : caxis + self.pooling_size] += val
+
+        return dinput
