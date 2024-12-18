@@ -139,6 +139,23 @@ class RecurrentLayer(DenseLayer):
                       for _ in range(size)]
 
 class ConvolutionalLayer(NeuralLayer):
+    """An Canvolutional Layer
+    
+    Attributes:
+    -----------
+        cells (list[Type[c.RecurrentCell]]): A list of all the cells in
+        the layer
+
+        weights (np.ndarray): The set of all weight matrix.
+
+        bias (np.ndarray): The set af bias term.
+
+        inputs (np.ndarray): The input values for the layer during
+        feedforward.
+    
+        output (np.ndarray): The output of the layer after applying
+        each neurons' transformations.
+    """
     def __init__(self, input_size: int, size: int, kernel_size: int,
                  input_channels: int, function: Type[f.Function]):
         super().__init__([c.ConvolutionalCell(input_size, kernel_size,

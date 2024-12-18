@@ -194,7 +194,7 @@ class ConvolutionalCell(NeuralCell):
                 If 'full' the convolution will be full
 
         """
-        x_size = x.shape[0]
+
         k_size = k.shape[0]
         reduction = k_size - 1
 
@@ -206,9 +206,18 @@ class ConvolutionalCell(NeuralCell):
             x = np.pad(x, min(reduction, padding), 'constant',
                     constant_values = 0)
 
-        return np.array([[np.sum(x[r : r + k_size, c : c + k_size] * k
-                 for c in range(x_size - reduction))]
-                for r in range(x_size-reduction)])
+        x_size = x.shape[0]
+
+        outsize = x_size - reduction
+        out = np.empty((outsize, outsize))
+
+        for raxis in range(outsize):
+            for caxis in range(outsize):
+                window = x[raxis : raxis + k_size,
+                           caxis : caxis + k_size]
+                out[raxis, caxis] = window * k
+
+        return out
 
     def feedforward(self, inputs):
         self.inputs = inputs
