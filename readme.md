@@ -31,7 +31,7 @@ The empty checkboxes are objectives that I already planned (I probably will add 
   - [ ] LSTM
   - [ ] GRU
 - [x] Convolutional
-- [ ] Pooling Layer
+- [x] Pooling Layer
 
 ### Network types
 
