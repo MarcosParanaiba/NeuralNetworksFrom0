@@ -1,5 +1,5 @@
 
-# Neural Networks From 0
+# Scratch Neural Networks
 
 This is a repository for me to study more deeply the understaing the neural networks' structure by not using any library. Hopefully, I will also help you!
 Any feedback will be very welcome and helpfull
